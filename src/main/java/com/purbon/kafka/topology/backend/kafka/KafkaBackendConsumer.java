@@ -11,6 +11,8 @@ import org.apache.kafka.common.PartitionInfo;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.TimeoutException;
 import org.apache.kafka.common.serialization.Serdes;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.time.Duration;
 import java.util.Collections;
@@ -22,6 +24,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static org.apache.kafka.clients.consumer.ConsumerConfig.GROUP_ID_CONFIG;
 
 public class KafkaBackendConsumer {
+  private static final Logger LOGGER = LogManager.getLogger(KafkaBackendConsumer.class);
   private static final Duration TIMEOUT = Duration.ofSeconds(10);
 
   private final Configuration config;
@@ -52,6 +55,7 @@ public class KafkaBackendConsumer {
   }
 
   public void retrieve(KafkaBackend callback) {
+    int times = 0;
     while (running.get()) {
       ConsumerRecords<String, BackendState> records = consumer.poll(TIMEOUT);
       callback.complete();
@@ -59,8 +63,10 @@ public class KafkaBackendConsumer {
         callback.apply(record);
       }
       if (isTopicRead()) {
+        LOGGER.info("Finished reading state after {} tries.", times);
         callback.initialLoadFinish();
       }
+      times++;
     }
   }
 
@@ -71,6 +77,7 @@ public class KafkaBackendConsumer {
               .get(assignedTopicPartition);
       return position >= endOffset;
     } catch (TimeoutException e) {
+      LOGGER.warn("Timeout while reading offsets", e);
       return false;
     }
   }
