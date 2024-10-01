@@ -48,6 +48,11 @@ public class KafkaBackendConsumer {
     consumerProperties.put(GROUP_ID_CONFIG, config.getKafkaBackendConsumerGroupId());
     consumer = new KafkaConsumer<>(consumerProperties);
 
+    List<PartitionInfo> partitions = consumer.partitionsFor(config.getJulieKafkaConfigTopic(), TIMEOUT);
+    if (partitions.size() > 1) {
+      LOGGER.warn("The configured state topic has more than one partition. This can potentially cause problems.");
+    }
+
     assignedTopicPartition = new TopicPartition(config.getJulieKafkaConfigTopic(), 0);
     var topicPartitions = Collections.singletonList(assignedTopicPartition);
     consumer.assign(topicPartitions);
