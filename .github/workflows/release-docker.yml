@@ -9,7 +9,6 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 jobs:
   ktb_docker_build:
-    if: github.repository == 'kafka-ops/julie'
     name: Build docker image
     runs-on: ubuntu-latest
     permissions:
