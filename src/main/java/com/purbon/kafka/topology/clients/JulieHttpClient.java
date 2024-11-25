@@ -206,7 +206,7 @@ public class JulieHttpClient {
   public void doDelete(String url, String body) throws IOException {
     LOGGER.debug("doDelete: " + url + " body: " + body);
     HttpRequest request = deleteRequest(url, body, DEFAULT_TIMEOUT_MS);
-    doRequest(request);
+    doDelete(request);
   }
 
   private HttpRequest deleteRequest(String url, String body, long timeoutMs) {
@@ -228,6 +228,34 @@ public class JulieHttpClient {
     }
   }
 
+  private String doDelete(HttpRequest request) throws IOException {
+    LOGGER.debug("method: " + request.method() + " request.uri: " + request.uri());
+    String result = "";
+    try {
+      var handler = HttpResponse.BodyHandlers.ofString();
+      HttpResponse<String> response = sendAsync(request, handler).get();
+      LOGGER.debug("method: " + request.method() + " response: " + response);
+      int statusCode = response.statusCode();
+      if (statusCode == 404) {
+        LOGGER.warn("Request returned 404. Not failing as a the deletion might have been handled manually.");
+      } else if (statusCode < 200 || statusCode > 299)) {
+        String body = response.body() != null ? response.body() : "";
+        throw new IOException(
+            "Something happened with the connection, response status code: "
+                + statusCode
+                + " body: "
+                + body);
+      }
+
+      if (response.body() != null) {
+        result = response.body();
+      }
+    } catch (Exception ex) {
+      throw new IOException(ex);
+    }
+    return result;
+  }
+  
   private String doRequest(HttpRequest request) throws IOException {
     LOGGER.debug("method: " + request.method() + " request.uri: " + request.uri());
     String result = "";
