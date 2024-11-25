@@ -238,7 +238,7 @@ public class JulieHttpClient {
       int statusCode = response.statusCode();
       if (statusCode == 404) {
         LOGGER.warn("Request returned 404. Not failing as a the deletion might have been handled manually.");
-      } else if (statusCode < 200 || statusCode > 299)) {
+      } else if (statusCode < 200 || statusCode > 299) {
         String body = response.body() != null ? response.body() : "";
         throw new IOException(
             "Something happened with the connection, response status code: "
