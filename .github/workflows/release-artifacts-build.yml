@@ -19,7 +19,9 @@ jobs:
           distribution: "temurin"
           cache: maven
       - name: Build with Maven
-        run: mvn -B package --file pom.xml
+        run: |
+          mvn versions:set -DnewVersion=$GITHUB_REF_NAME
+          mvn -B package --file pom.xml
       - name: Build the rpm
         run: mvn rpm:rpm
       - name: '📦 publish deb'
@@ -28,6 +30,5 @@ jobs:
           zip -r deb.package.zip . -i '*.deb'
           gh release upload $GITHUB_REF_NAME deb.package.zip        
         env:
-          TAG_NAME: ${{ github.ref }}
           GITHUB_TOKEN: ${{ github.TOKEN }}
         shell: bash
