@@ -26,7 +26,8 @@ jobs:
         run: |
           cd target/
           zip -r deb.package.zip . -i '*.deb'
-          gh release upload ${{github.event.release.tag_name}} deb.package.zip        
+          gh release upload $RELEASE_TAG deb.package.zip        
         env:
+          RELEASE_TAG:  ${{github.event.release.tag_name}}
           GITHUB_TOKEN: ${{ github.TOKEN }}
         shell: bash
