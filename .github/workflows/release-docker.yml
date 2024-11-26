@@ -3,7 +3,7 @@ on:
   push:
     tags:
       - 'v3.*.*'
-      - 'v4.*.*'
+      #- 'v4.*.*'
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
