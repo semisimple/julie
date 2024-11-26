@@ -22,15 +22,11 @@ jobs:
         run: mvn -B package --file pom.xml
       - name: Build the rpm
         run: mvn rpm:rpm
-      - uses: actions/upload-artifact@v4
-        with:
-          name: RPM package
-          path: target/rpm/julie-ops/RPMS/noarch/*.rpm
-      - uses: actions/upload-artifact@v4
-        with:
-          name: DEB package
-          path: target/*.deb
-      - uses: actions/upload-artifact@v4
-        with:
-          name: FAT jar
-          path: target/julie-ops.jar
+      - name: '📦 publish deb'
+        run: |
+          cd target/
+          zip -r deb.package.zip . -i '*.deb'
+          gh release upload ${{github.event.release.tag_name}} deb.package.zip        
+        env:
+          GITHUB_TOKEN: ${{ github.TOKEN }}
+        shell: bash
