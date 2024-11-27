@@ -22,8 +22,6 @@ jobs:
         run: |
           mvn versions:set -DnewVersion="${GITHUB_REF_NAME:1}"
           mvn -B package --file pom.xml
-      - name: Build the rpm
-        run: mvn rpm:rpm
       - name: '📦 publish deb'
         run: |
           cd target/
